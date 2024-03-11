@@ -20,25 +20,11 @@ int main() {
     cout << "Enter the file name" << endl;
     cin >> fileName;
     inData.open(fileName);
-    outData.open("/payRise/output.dat");
-
-    // string line;
-    // while (getline(inData, line)) {
-    //     // cout << line << endl;
-    //     inData >> lastName >> firstName >> salary >> rate;
-    //     cout << lastName << firstName << salary << rate << endl;
-    // }
+    outData.open("output.dat");
 
     outData << fixed << showpoint << setprecision(2);
 
-    // for (string l; getline(inData, l);) {
-    //     // cout << l << endl;
-    //     inData >> lastName >> firstName >> salary >> rate;
-    //     cout << lastName << firstName << salary << rate << endl;
-    // }
-
     while (inData >> lastName >> firstName >> salary >> rate) {
-        // cout << lastName << firstName << salary << rate << endl;
         updatedSalary = salary * (1 + rate / 100);
         outData << firstName << " " << lastName << " " << updatedSalary << endl;
     }
