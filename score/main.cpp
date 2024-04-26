@@ -16,11 +16,10 @@ using namespace std;
 
 int main() {
     map<int, int> score_map;
-    string result[8];
     ifstream inData;
     ofstream outData;
     string fileName;
-    
+
     cout << "Enter the file name" << endl;
     cin >> fileName;
     inData.open(fileName);
