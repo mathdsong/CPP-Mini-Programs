@@ -3,13 +3,14 @@
 #include <fstream>
 #include <string>
 #include <iomanip>
+#include <vector>
 
 using namespace std;
 
-void getData(ifstream& inf, string n[], double tstData[][6], int count);
+void getData(fstream& inf, string n[], double tstData[][6], int count);
 void calculateAverage(double tstData[][6], int count);
 void calculateGrade(double tstData[][6], char gr[], int count);
-void print(string n[], double tstData[][6], char gr[], int count);
+void output(string fileName, string n[], double tstData[][6], char gr[], int count);
 
 int main() {
 	string names[10];
@@ -26,21 +27,50 @@ int main() {
     return 1;
   }
 
-  cout << fixed << showpoint << setprecision(2);
   getData(inFile, names, testData, 10);
   calculateAverage(testData, 10);
   calculateGrade(testData, grade, 10);
-  print(names, testData, grade, 10);
   inFile.close();
+  output("output.txt", names, testData, grade, 10);
 	return 0;
 }
 
-void getData(ifstream& inf, string n[], double tstData[][6], int count) {
+vector<string> sortStudentNames(string n[], int count) {
+  // copy the array into a vector:
+  vector<string> sortedNames(n, n + count);
   for (int i = 0; i < count; i++) {
-    inf >> n[i];
-    for (int j = 0; j < 5; j++)
-      inf >> tstData[i][j];
-    tstData[i][5] = 0.0;
+      for (int j = i + 1; j < count; j++) {
+          if (sortedNames[j] < sortedNames[i]) {
+              swap(sortedNames[i], sortedNames[j]);
+          }
+      }
+  }
+  return sortedNames;
+}
+
+void getData(fstream& inf, string n[], double tstData[][6], int count) {
+  string temp[count];
+  double tempData[count][6];
+  for (int i = 0; i < count; i++)
+  {
+      inf >> temp[i];
+
+      for (int j = 0; j < 5; j++)
+          inf >> tempData[i][j];
+
+      tempData[i][5] = 0.0;
+  }
+  // perform reorder:
+  vector<string> sortedNames = sortStudentNames(temp, count);
+  for (int k = 0; k < count; k++) {
+      for (int p = 0; p < count; p++) {
+          if (temp[p] == sortedNames[k]) {
+              n[k] = temp[p];
+              for (int l = 0; l < 5; l++) {
+                  tstData[k][l] = tempData[p][l];
+              }
+          }
+      }
   }
 }
 
@@ -68,9 +98,13 @@ void calculateGrade(double tstData[][6], char gr[], int count) {
       gr[i] = 'F';
 }
 
-void print(string n[], double tstData[][6], char gr[], int count) {
+// output the results
+void output(string fileName, string n[], double tstData[][6], char gr[], int count) {
+  ofstream outData;
+  outData.open(fileName);
+  outData << fixed << showpoint << setprecision(2);
   double sum = 0.0;
-  cout << left << setw(10) << "Name"
+  outData << left << setw(10) << "Name"
       << right << setw(8) << "Test 1"
       << setw(8) << "Test 2"
       << setw(8) << "Test 3"
@@ -80,17 +114,17 @@ void print(string n[], double tstData[][6], char gr[], int count) {
       << setw(8) << "Grade" << endl;
 
   for (int i = 0; i < count; i++) {
-    cout << left << setw(10) << n[i];
-    cout << right;
+    outData << left << setw(10) << n[i];
+    outData << right;
 
     for (int j = 0; j < 5; j++)
-        cout << setw(8) << tstData[i][j];
+        outData << setw(8) << tstData[i][j];
 
-    cout << setw(10) << tstData[i][5]
+    outData << setw(10) << tstData[i][5]
           << setw(6) << gr[i] << endl;
     sum = sum + tstData[i][5];
   }
 
-  cout << endl << endl;
-  cout << "Class average: " << sum / count << endl;
+  outData << endl << endl;
+  outData << "Class average: " << sum / count << endl;
 }
